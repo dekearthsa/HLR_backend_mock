@@ -1,0 +1,19 @@
+{
+  "name": "hlr_backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "fastify": "^5.2.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.26"
+  }
+}
