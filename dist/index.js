@@ -27,8 +27,8 @@ const PORT = 3311;
 //     endDay: Number
 // }
 const pool = promise_1.default.createPool({
-    socketPath: '/var/run/mysqld/mysqld.sock',
-    // host: 'localhost',
+    // socketPath: '/var/run/mysqld/mysqld.sock',
+    host: '127.0.0.1',
     password: '',
     // port: 3306,
     database: 'monitoring_tongdy',
