@@ -23,9 +23,10 @@ interface UserParams {
 // }
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    password: '',
-    port: 3306,
+    socketPath: '/var/run/mysqld/mysqld.sock',
+    // host: 'localhost',
+    // password: '',
+    // port: 3306,
     database: 'monitoring_tongdy',
     user: 'root',
     waitForConnections: true,
