@@ -28,6 +28,7 @@ const PORT = 3311;
 // }
 const pool = promise_1.default.createPool({
     host: 'localhost',
+    password: '',
     port: 3306,
     database: 'monitoring_tongdy',
     user: 'root',
