@@ -38,7 +38,7 @@ fastify.get("/debug", (request, reply) => {
     reply.send(`service running status ok!`)
 })
 
-fastify.get<{ Params: UserParams }>('/api/downlod/selected/:year/:month/:day', async (request, reply) => {
+fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day', async (request, reply) => {
     const { year, month, day } = request.params;
     const [data] = await pool.query(
         `SELECT *

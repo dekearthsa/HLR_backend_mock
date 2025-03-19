@@ -38,7 +38,7 @@ const pool = promise_1.default.createPool({
 fastify.get("/debug", (request, reply) => {
     reply.send(`service running status ok!`);
 });
-fastify.get('/api/downlod/selected/:year/:month/:day', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+fastify.get('/api/download/selected/:year/:month/:day', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     const { year, month, day } = request.params;
     const [data] = yield pool.query(`SELECT *
             FROM tongdy 
