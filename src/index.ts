@@ -24,6 +24,7 @@ interface UserParams {
 
 const pool = mysql.createPool({
     host: 'localhost',
+    password: '',
     port: 3306,
     database: 'monitoring_tongdy',
     user: 'root',
