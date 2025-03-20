@@ -19,19 +19,41 @@ const fastify = (0, fastify_1.default)({
     logger: false
 });
 const PORT = 3311;
-// interface UserParamsRange {
-//     atYear: Number
-//     atMonth: Number
-//     atDay: Number
-//     endYear: Number
-//     endMonth: Number
-//     endDay: Number
-// }
+const paramsSchema = {
+    type: 'object',
+    properties: {
+        year: { type: "integer", minimum: 2000, maximum: 2100 },
+        month: { type: "integer", minimum: 1, maximum: 12 },
+        day: { type: "integer", minimum: 1, maximum: 31 }
+    },
+    required: ["year", "month", "day"]
+};
+const resGetAPISchema = {
+    200: {
+        type: "array",
+        item: {
+            type: "object",
+            properties: {
+                id: { type: "integer" },
+                timestamp: { type: "string", format: "date-time" },
+                temp: { type: "number" },
+                co2: { type: "integer" },
+                device_name: { type: "string" },
+                humidity: { type: "number" },
+            },
+            require: ["id", "temp", "humidity", "co2", "device_name", "timestamp"]
+        }
+    },
+    404: {
+        type: "object",
+        properties: {
+            error: { type: "string" }
+        }
+    }
+};
 const pool = promise_1.default.createPool({
-    // socketPath: '/var/run/mysqld/mysqld.sock',
     host: '127.0.0.1',
     password: '',
-    // port: 3306,
     database: 'monitoring_tongdy',
     user: 'root',
     waitForConnections: true,
@@ -41,7 +63,7 @@ const pool = promise_1.default.createPool({
 fastify.get("/debug", (request, reply) => {
     reply.send(`service running status ok!`);
 });
-fastify.get('/api/download/selected/:year/:month/:day', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+fastify.get('/api/download/selected/:year/:month/:day', { schema: { params: paramsSchema } }, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { year, month, day } = request.params;
         const [data] = yield pool.query(`SELECT *
@@ -64,7 +86,7 @@ fastify.get('/api/download/selected/:year/:month/:day', (request, reply) => __aw
         reply.send("error /api/download/selected " + err);
     }
 }));
-fastify.get('/api/selected/:year/:month/:day', (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+fastify.get('/api/selected/:year/:month/:day', { schema: { params: paramsSchema, response: resGetAPISchema } }, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     const { year, month, day } = request.params;
     const [data] = yield pool.query(`SELECT *
             FROM tongdy 
@@ -73,10 +95,6 @@ fastify.get('/api/selected/:year/:month/:day', (request, reply) => __awaiter(voi
             AND DAY(timestamp) = ?`, [year, month, day]);
     reply.send(data);
 }));
-// fastify.get<{ Params: UserParamsRange }>('/api/downlod/range/:atYear/:atMonth/:atDay/:endYear/:endMonth/:endDay', (request, reply) => {
-//     const { atYear, atMonth, atDay, endYear, endMonth, endDay } = request.params;
-//     reply.send({ hello: `hello world` })
-// }) 2jVWUXojlziLE7H0q0cZo9xFOZg_6Z8mie7CiRxsAUARrNAnb
 fastify.listen({ port: PORT }, (err, address) => {
     if (err)
         throw err;
