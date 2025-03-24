@@ -57,7 +57,7 @@ const resGetAPISchema = {
     }
 };
 const pool = promise_1.default.createPool({
-    host: 'localhost',
+    socketPath: '/var/run/mysqld/mysqld.sock',
     database: 'monitoring_tongdy',
     user: 'root',
     waitForConnections: true,

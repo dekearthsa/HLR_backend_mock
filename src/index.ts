@@ -55,13 +55,14 @@ const resGetAPISchema = {
 }
 
 const pool = mysql.createPool({
-    host: 'localhost',
+    socketPath: '/var/run/mysqld/mysqld.sock',
     database: 'monitoring_tongdy',
     user: 'root',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
+
 
 
 
