@@ -8,7 +8,7 @@ const fastify = Fastify({
 })
 
 fastify.register(cors, {
-    origin: "*", // หรือจะใส่แค่ http://localhost:3000 ก็ได้
+    origin: "*", 
     methods: ["GET"],
 });
 
