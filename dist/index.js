@@ -15,8 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
 const promise_1 = __importDefault(require("mysql2/promise"));
 const json2csv_1 = require("json2csv");
+const cors_1 = __importDefault(require("@fastify/cors"));
 const fastify = (0, fastify_1.default)({
     logger: false
+});
+fastify.register(cors_1.default, {
+    origin: "*", // หรือจะใส่แค่ http://localhost:3000 ก็ได้
+    methods: ["GET"],
 });
 const PORT = 3311;
 const paramsSchema = {
@@ -63,30 +68,11 @@ const pool = promise_1.default.createPool({
 fastify.get("/debug", (request, reply) => {
     reply.send(`service running status ok!`);
 });
-// fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day', { schema: { params: paramsSchema } }, async (request, reply) => {
-//     try {
-//         const { year, month, day } = request.params;
-//         const [data] = await pool.query(
-//             `SELECT *
-//             FROM tongdy 
-//             WHERE YEAR(timestamp) = ? 
-//             AND MONTH(timestamp) = ? 
-//             AND DAY(timestamp) = ?`, [year, month, day]
-//         );
-//         if (Array.isArray(data) && data.length > 0) {
-//             const json2csvParser = new Parser();
-//             const csv = json2csvParser.parse(data);
-//             reply.header('Content-Type', 'text/csv');
-//             reply.header('Content-Disposition', `attachment; filename="data_${year}-${month}-${day}.csv"`);
-//             return reply.send(csv);
-//         } else {
-//             return reply.code(404).send({ error: "No data found for the selected date" });
-//         }
-//     } catch (err) {
-//         reply.send("error /api/download/selected " + err)
-//     }
-// })
-fastify.get('/api/download/selected/:year/:month/:day', { schema: { params: paramsSchema } }, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+fastify.get('/api/download/selected/:year/:month/:day', {
+    schema: {
+        params: paramsSchema
+    }
+}, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { year, month, day } = request.params;
         const [data] = yield pool.query(`SELECT *,
@@ -116,7 +102,12 @@ fastify.get('/api/download/selected/:year/:month/:day', { schema: { params: para
         reply.send("error /api/download/selected " + err);
     }
 }));
-fastify.get('/api/selected/:year/:month/:day', { schema: { params: paramsSchema, response: resGetAPISchema } }, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+fastify.get('/api/selected/:year/:month/:day', {
+    schema: {
+        params: paramsSchema,
+        response: resGetAPISchema
+    }
+}, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
     const { year, month, day } = request.params;
     const [data] = yield pool.query(`SELECT *
             FROM tongdy 

@@ -1,10 +1,16 @@
 import Fastify from 'fastify'
 import mysql from 'mysql2/promise'
 import { Parser } from 'json2csv'
+import cors from '@fastify/cors';
 
 const fastify = Fastify({
     logger: false
 })
+
+fastify.register(cors, {
+    origin: "*", // หรือจะใส่แค่ http://localhost:3000 ก็ได้
+    methods: ["GET"],
+});
 
 const PORT = 3311
 
@@ -64,38 +70,17 @@ fastify.get("/debug", (request, reply) => {
     reply.send(`service running status ok!`)
 })
 
-// fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day', { schema: { params: paramsSchema } }, async (request, reply) => {
-//     try {
-//         const { year, month, day } = request.params;
-//         const [data] = await pool.query(
-//             `SELECT *
-//             FROM tongdy 
-//             WHERE YEAR(timestamp) = ? 
-//             AND MONTH(timestamp) = ? 
-//             AND DAY(timestamp) = ?`, [year, month, day]
-//         );
-//         if (Array.isArray(data) && data.length > 0) {
-//             const json2csvParser = new Parser();
-//             const csv = json2csvParser.parse(data);
 
-//             reply.header('Content-Type', 'text/csv');
-//             reply.header('Content-Disposition', `attachment; filename="data_${year}-${month}-${day}.csv"`);
-
-//             return reply.send(csv);
-//         } else {
-//             return reply.code(404).send({ error: "No data found for the selected date" });
-//         }
-//     } catch (err) {
-//         reply.send("error /api/download/selected " + err)
-//     }
-
-// })
-
-fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day', { schema: { params: paramsSchema } }, async (request, reply) => {
-    try {
-        const { year, month, day } = request.params;
-        const [data] = await pool.query(
-            `SELECT *,
+fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day',
+    {
+        schema: {
+            params: paramsSchema
+        }
+    }, async (request, reply) => {
+        try {
+            const { year, month, day } = request.params;
+            const [data] = await pool.query(
+                `SELECT *,
             CASE
                 WHEN device_name = 'tongdy_1' THEN (co2 * 0.922144) + 220.8915
                 WHEN device_name = 'tongdy_2' THEN (co2 * 1.11773) - 97.9053
@@ -107,37 +92,43 @@ fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day', 
             WHERE YEAR(timestamp) = ? 
             AND MONTH(timestamp) = ? 
             AND DAY(timestamp) = ?`, [year, month, day]
-        );
+            );
 
 
-        if (Array.isArray(data) && data.length > 0) {
-            const json2csvParser = new Parser();
-            const csv = json2csvParser.parse(data);
+            if (Array.isArray(data) && data.length > 0) {
+                const json2csvParser = new Parser();
+                const csv = json2csvParser.parse(data);
 
-            reply.header('Content-Type', 'text/csv');
-            reply.header('Content-Disposition', `attachment; filename="data_${year}-${month}-${day}.csv"`);
+                reply.header('Content-Type', 'text/csv');
+                reply.header('Content-Disposition', `attachment; filename="data_${year}-${month}-${day}.csv"`);
 
-            return reply.send(csv);
-        } else {
-            return reply.code(404).send({ error: "No data found for the selected date" });
+                return reply.send(csv);
+            } else {
+                return reply.code(404).send({ error: "No data found for the selected date" });
+            }
+        } catch (err) {
+            reply.send("error /api/download/selected " + err)
         }
-    } catch (err) {
-        reply.send("error /api/download/selected " + err)
-    }
-})
+    })
 
-fastify.get<{ Params: UserParams }>('/api/selected/:year/:month/:day', { schema: { params: paramsSchema, response: resGetAPISchema } }, async (request, reply) => {
-    const { year, month, day } = request.params;
-    const [data] = await pool.query(
-        `SELECT *
+fastify.get<{ Params: UserParams }>('/api/selected/:year/:month/:day',
+    {
+        schema: {
+            params: paramsSchema,
+            response: resGetAPISchema
+        }
+    }, async (request, reply) => {
+        const { year, month, day } = request.params;
+        const [data] = await pool.query(
+            `SELECT *
             FROM tongdy 
             WHERE YEAR(timestamp) = ? 
             AND MONTH(timestamp) = ? 
             AND DAY(timestamp) = ?`, [year, month, day]
-    );
+        );
 
-    reply.send(data);
-})
+        reply.send(data);
+    })
 
 
 fastify.listen({ port: PORT }, (err, address) => {
