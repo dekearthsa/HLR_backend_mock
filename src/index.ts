@@ -8,7 +8,7 @@ const fastify = Fastify({
 })
 
 fastify.register(cors, {
-    origin: "*", 
+    origin: "*",
     methods: ["GET"],
 });
 
@@ -55,8 +55,7 @@ const resGetAPISchema = {
 }
 
 const pool = mysql.createPool({
-    host: '127.0.0.1',
-    password: '',
+    host: 'localhost',
     database: 'monitoring_tongdy',
     user: 'root',
     waitForConnections: true,

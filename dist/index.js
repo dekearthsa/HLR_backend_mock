@@ -20,7 +20,7 @@ const fastify = (0, fastify_1.default)({
     logger: false
 });
 fastify.register(cors_1.default, {
-    origin: "*", // หรือจะใส่แค่ http://localhost:3000 ก็ได้
+    origin: "*",
     methods: ["GET"],
 });
 const PORT = 3311;
@@ -57,8 +57,7 @@ const resGetAPISchema = {
     }
 };
 const pool = promise_1.default.createPool({
-    host: '127.0.0.1',
-    password: '',
+    host: 'localhost',
     database: 'monitoring_tongdy',
     user: 'root',
     waitForConnections: true,
