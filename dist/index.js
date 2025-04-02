@@ -56,6 +56,28 @@ const resGetAPISchema = {
         }
     }
 };
+const resGetAPIVamSchema = {
+    200: {
+        type: "array",
+        item: {
+            type: "object",
+            properties: {
+                id: { type: "integer" },
+                timestamp: { type: "string", format: "date-time" },
+                temp: { type: "number" },
+                eVOC: { type: "number" },
+                co2: { type: "integer" },
+            },
+            require: ["id", "timestamp", "eVOC", "co2"]
+        }
+    },
+    404: {
+        type: "object",
+        properties: {
+            error: { type: "string" }
+        }
+    }
+};
 const pool = promise_1.default.createPool({
     socketPath: '/var/run/mysqld/mysqld.sock',
     database: 'monitoring_tongdy',
@@ -120,6 +142,46 @@ fastify.get('/api/selected/:year/:month/:day', {
             WHERE YEAR(timestamp) = ? 
             AND MONTH(timestamp) = ? 
             AND DAY(timestamp) = ?`, [year, month, day]);
+    reply.send(data);
+}));
+fastify.get('/api/vam/download/selected/:year/:month/:day', {
+    schema: {
+        params: paramsSchema
+    }
+}, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { year, month, day } = request.params;
+        const [data] = yield pool.query(`SELECT *FROM VAM_DATA
+                WHERE YEAR(STR_TO_DATE(strDatetime, '%d/%m/%y %H:%i:%s')) = ?
+                AND MONTH(STR_TO_DATE(strDatetime, '%d/%m/%y %H:%i:%s')) = ?
+                AND DAY(STR_TO_DATE(strDatetime, '%d/%m/%y %H:%i:%s')) = ?`, [year, month, day]);
+        if (Array.isArray(data) && data.length > 0) {
+            const json2csvParser = new json2csv_1.Parser();
+            const csv = json2csvParser.parse(data);
+            reply.header('Content-Type', 'text/csv');
+            reply.header('Content-Disposition', `attachment; filename="data_${year}-${month}-${day}.csv"`);
+            return reply.send(csv);
+        }
+        else {
+            return reply.code(404).send({ error: "No data found for the selected date" });
+        }
+    }
+    catch (err) {
+        reply.send("error /api/download/selected " + err);
+    }
+}));
+fastify.get('/api/vam/selected/:year/:month/:day', {
+    schema: {
+        params: paramsSchema,
+        response: resGetAPIVamSchema
+    }
+}, (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
+    const { year, month, day } = request.params;
+    const [data] = yield pool.query(`SELECT *
+            FROM VAM_DATA 
+            WHERE YEAR(STR_TO_DATE(strDatetime, '%d/%m/%y %H:%i:%s')) = ?
+            AND MONTH(STR_TO_DATE(strDatetime, '%d/%m/%y %H:%i:%s')) = ?
+            AND DAY(STR_TO_DATE(strDatetime, '%d/%m/%y %H:%i:%s')) = ?`, [year, month, day]);
     reply.send(data);
 }));
 fastify.listen({ port: PORT }, (err, address) => {
