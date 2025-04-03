@@ -86,13 +86,9 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-
-
-
 fastify.get("/debug", (request, reply) => {
     reply.send(`service running status ok!`)
 })
-
 
 fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day',
     {
@@ -117,11 +113,9 @@ fastify.get<{ Params: UserParams }>('/api/download/selected/:year/:month/:day',
             AND DAY(timestamp) = ?`, [year, month, day]
             );
 
-
             if (Array.isArray(data) && data.length > 0) {
                 const json2csvParser = new Parser();
                 const csv = json2csvParser.parse(data);
-
                 reply.header('Content-Type', 'text/csv');
                 reply.header('Content-Disposition', `attachment; filename="data_${year}-${month}-${day}.csv"`);
 
@@ -159,8 +153,6 @@ fastify.get<{ Params: UserParams }>('/api/selected/:year/:month/:day',
 
         reply.send(data);
     })
-
-
 
 fastify.get<{ Params: UserParams }>('/api/vam/download/selected/:year/:month/:day',
     {
@@ -213,9 +205,9 @@ fastify.get<{ Params: UserParams }>('/api/vam/selected/:year/:month/:day',
         reply.send(data);
     })
 
-
-
 fastify.listen({ port: PORT }, (err, address) => {
     if (err) throw err
     console.log(`fastify listen port ${PORT}`)
 })
+
+// https://main.d1yojhrhnre2kp.amplifyapp.com/
