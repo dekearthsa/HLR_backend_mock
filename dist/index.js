@@ -46,7 +46,7 @@ const resGetAPISchema = {
                 device_name: { type: "string" },
                 humidity: { type: "number" },
             },
-            require: ["id", "temp", "humidity", "co2", "device_name", "timestamp"]
+            require: ["id", "temp", "humidity", "co2", "device_name", "timestamp", "adjust_co2", "device_name_label"]
         }
     },
     404: {
@@ -103,7 +103,14 @@ fastify.get('/api/download/selected/:year/:month/:day', {
                 WHEN device_name = 'tongdy_3' THEN (co2 * 1.070889) - 2.3568
                 WHEN device_name = 'tongdy_4' THEN (co2 * 1.123171) - 57.9253
                 ELSE co2
-            END AS adjust_co2
+            END AS adjust_co2,
+            CASE
+                WHEN device_name = 'tongdy_1' THEN "HLR intlet"
+                WHEN device_name = 'tongdy_2' THEN "Carbon inlet"
+                WHEN device_name = 'tongdy_3' THEN "Carbon Outlet"
+                WHEN device_name = 'tongdy_4' THEN "HLR Exhaust"
+                ELSE device_name
+            END AS device_name_label
             FROM tongdy 
             WHERE YEAR(timestamp) = ? 
             AND MONTH(timestamp) = ? 
@@ -137,7 +144,14 @@ fastify.get('/api/selected/:year/:month/:day', {
                 WHEN device_name = 'tongdy_3' THEN (co2 * 1.070889) - 2.3568
                 WHEN device_name = 'tongdy_4' THEN (co2 * 1.123171) - 57.9253
                 ELSE co2
-            END AS adjust_co2
+            END AS adjust_co2,
+            CASE
+                WHEN device_name = 'tongdy_1' THEN "HLR intlet"
+                WHEN device_name = 'tongdy_2' THEN "Carbon inlet"
+                WHEN device_name = 'tongdy_3' THEN "Carbon Outlet"
+                WHEN device_name = 'tongdy_4' THEN "HLR Exhaust"
+                ELSE device_name
+            END AS device_name_label
             FROM tongdy 
             WHERE YEAR(timestamp) = ? 
             AND MONTH(timestamp) = ? 
@@ -189,3 +203,4 @@ fastify.listen({ port: PORT }, (err, address) => {
         throw err;
     console.log(`fastify listen port ${PORT}`);
 });
+// https://main.d1yojhrhnre2kp.amplifyapp.com/
