@@ -98,9 +98,9 @@ fastify.get('/api/download/selected/:year/:month/:day', {
         const { year, month, day } = request.params;
         const [data] = yield pool.query(`SELECT *,
             CASE
-                WHEN device_name = 'tongdy_1' THEN (co2 * 0.922144) + 220.8915
+                WHEN device_name = 'tongdy_1' THEN (co2 * 0.993711) + 388.4346
                 WHEN device_name = 'tongdy_2' THEN (co2 * 1.11773) - 97.9053
-                WHEN device_name = 'tongdy_3' THEN (co2 * 1.070889) - 2.3568
+                WHEN device_name = 'tongdy_3' THEN (co2 * 1.05137) + 4.699737
                 WHEN device_name = 'tongdy_4' THEN (co2 * 1.123171) - 57.9253
                 ELSE co2
             END AS adjust_co2,
@@ -139,9 +139,9 @@ fastify.get('/api/selected/:year/:month/:day', {
     const { year, month, day } = request.params;
     const [data] = yield pool.query(`SELECT *,
             CASE
-                WHEN device_name = 'tongdy_1' THEN (co2 * 0.922144) + 220.8915
+                WHEN device_name = 'tongdy_1' THEN (co2 * 0.993711) + 388.4346
                 WHEN device_name = 'tongdy_2' THEN (co2 * 1.11773) - 97.9053
-                WHEN device_name = 'tongdy_3' THEN (co2 * 1.070889) - 2.3568
+                WHEN device_name = 'tongdy_3' THEN (co2 * 1.05137) + 4.699737
                 WHEN device_name = 'tongdy_4' THEN (co2 * 1.123171) - 57.9253
                 ELSE co2
             END AS adjust_co2,
